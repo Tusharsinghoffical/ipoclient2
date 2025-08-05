@@ -1,6 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 router = DefaultRouter()
 router.register(r'ipo', views.IPOViewSet)
@@ -60,3 +63,7 @@ urlpatterns = [
     path('sme-ipos/', views.sme_ipos, name='sme_ipos'),
     path('main-board-ipos/', views.main_board_ipos, name='main_board_ipos'),
 ] 
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
