@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ipoclient2
+    env: python
+    region: oregon
+    branch: main
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn ipo_project.wsgi:application"
+    runtime: python
+    pythonVersion: 3.11
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: ipo_project.settings
+      - key: SECRET_KEY
+        value: django-insecure-your-secret-key-here
+      - key: ALLOWED_HOSTS
+        value: ipoclientproject.onrender.com
+      # Add more env vars like DB credentials, SMTP, etc. here
