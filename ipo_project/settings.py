@@ -26,8 +26,10 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['ipoclientproject.onrender.com','*']
+ALLOWED_HOSTS = ['ipoclient2.onrender.com', 'localhost', '127.0.0.1']
 
+# Allow all origins if needed (for CORS issues in frontend-backend setups)
+CSRF_TRUSTED_ORIGINS = ['https://ipoclient2.onrender.com']
 
 # Application definition
 
@@ -136,7 +138,8 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Media files
 MEDIA_URL = '/media/'
