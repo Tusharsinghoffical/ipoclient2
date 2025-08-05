@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if ipo %}Edit IPO{% else %}Create IPO{% endif %} - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">{% if ipo %}Edit IPO{% else %}Create New IPO{% endif %}</h1>
+                <p class="mb-0">{% if ipo %}Update IPO information{% else %}Add a new IPO to the system{% endif %}</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:admin_dashboard' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- IPO Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>{% if ipo %}Edit IPO{% else %}Create IPO{% endif %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <!-- Basic Information -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Company Name *</label>
+                                    <input type="text" name="company_name" class="form-control" value="{{ ipo.company_name|default:'' }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Issue Type *</label>
+                                    <select name="issue_type" class="form-select" required>
+                                        <option value="">Select Issue Type</option>
+                                        <option value="Book Built Issue" {% if ipo.issue_type == 'Book Built Issue' %}selected{% endif %}>Book Built Issue</option>
+                                        <option value="Fixed Price Issue" {% if ipo.issue_type == 'Fixed Price Issue' %}selected{% endif %}>Fixed Price Issue</option>
+                                        <option value="SME IPO" {% if ipo.issue_type == 'SME IPO' %}selected{% endif %}>SME IPO</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Price Band *</label>
+                                    <input type="text" name="price_band" class="form-control" value="{{ ipo.price_band|default:'' }}" placeholder="₹100 - ₹120" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Issue Size *</label>
+                                    <input type="text" name="issue_size" class="form-control" value="{{ ipo.issue_size|default:'' }}" placeholder="₹500 Crores" required>
+                                </div>
+                            </div>
+
+                            <!-- Dates -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Open Date *</label>
+                                    <input type="date" name="open_date" class="form-control" value="{{ ipo.open_date|date:'Y-m-d'|default:'' }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Close Date *</label>
+                                    <input type="date" name="close_date" class="form-control" value="{{ ipo.close_date|date:'Y-m-d'|default:'' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Listing Date</label>
+                                    <input type="date" name="listing_date" class="form-control" value="{{ ipo.listing_date|date:'Y-m-d'|default:'' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Status *</label>
+                                    <select name="status" class="form-select" required>
+                                        <option value="">Select Status</option>
+                                        <option value="upcoming" {% if ipo.status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                                        <option value="ongoing" {% if ipo.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                                        <option value="listed" {% if ipo.status == 'listed' %}selected{% endif %}>Listed</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Pricing -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">IPO Price (₹)</label>
+                                    <input type="number" step="0.01" name="ipo_price" class="form-control" value="{{ ipo.ipo_price|default:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Listing Price (₹)</label>
+                                    <input type="number" step="0.01" name="listing_price" class="form-control" value="{{ ipo.listing_price|default:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Current Market Price (₹)</label>
+                                    <input type="number" step="0.01" name="current_market_price" class="form-control" value="{{ ipo.current_market_price|default:'' }}">
+                                </div>
+                            </div>
+
+                            <!-- Files -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Company Logo</label>
+                                    <input type="file" name="logo" class="form-control" accept="image/*">
+                                    {% if ipo.logo %}
+                                        <small class="text-muted">Current: {{ ipo.logo.name }}</small>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">RHP Document</label>
+                                    <input type="file" name="rhp_pdf" class="form-control" accept=".pdf">
+                                    {% if ipo.rhp_pdf %}
+                                        <small class="text-muted">Current: {{ ipo.rhp_pdf.name }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">DRHP Document</label>
+                                    <input type="file" name="drhp_pdf" class="form-control" accept=".pdf">
+                                    {% if ipo.drhp_pdf %}
+                                        <small class="text-muted">Current: {{ ipo.drhp_pdf.name }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{% url 'ipo_app:admin_dashboard' %}" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>{% if ipo %}Update IPO{% else %}Create IPO{% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Import IPOs - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Bulk Import IPOs</h1>
+                <p class="mb-0">Upload a CSV file to add multiple IPOs at once with validation and preview.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:admin_dashboard' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Upload Section -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-upload text-success me-2"></i>Upload CSV File
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post" enctype="multipart/form-data" id="uploadForm">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Select CSV File</label>
+                                <div class="input-group">
+                                    <input type="file" name="csv_file" class="form-control" accept=".csv" required id="csvFile">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('csvFile').click()">
+                                        <i class="fas fa-folder-open"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Maximum file size: 5MB. Supported format: CSV only.</small>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Import Options</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="skip_duplicates" id="skipDuplicates" checked>
+                                            <label class="form-check-label" for="skipDuplicates">
+                                                Skip duplicate companies
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="validate_data" id="validateData" checked>
+                                            <label class="form-check-label" for="validateData">
+                                                Validate data before import
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg" id="importBtn">
+                                    <i class="fas fa-upload me-2"></i>Import IPOs
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="previewFile()">
+                                    <i class="fas fa-eye me-2"></i>Preview Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Preview Section -->
+                <div class="card border-0 shadow-sm" id="previewSection" style="display: none;">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-table text-info me-2"></i>Data Preview
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm" id="previewTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Issue Type</th>
+                                        <th>Issue Size</th>
+                                        <th>Status</th>
+                                        <th>Open Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewTableBody">
+                                    <!-- Preview data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Showing first 5 rows. Full import will process all data.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Instructions and Sample -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle text-primary me-2"></i>Instructions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-3">
+                            <li>Download the sample CSV template</li>
+                            <li>Fill in your IPO data</li>
+                            <li>Save as CSV format</li>
+                            <li>Upload and preview</li>
+                            <li>Import to database</li>
+                        </ol>
+                        <div class="d-grid">
+                            <a href="{% static 'sample_ipo_import.csv' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-download me-2"></i>Download Sample CSV
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-list text-warning me-2"></i>Required Fields
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><strong>company_name</strong> - Company name</li>
+                            <li class="mb-2"><strong>issue_type</strong> - Book Built Issue, Fixed Price Issue, SME IPO</li>
+                            <li class="mb-2"><strong>price_band</strong> - Price band (e.g., ₹450 - ₹500)</li>
+                            <li class="mb-2"><strong>issue_size</strong> - Issue size (e.g., 1200 Cr)</li>
+                            <li class="mb-2"><strong>open_date</strong> - YYYY-MM-DD format</li>
+                            <li class="mb-2"><strong>close_date</strong> - YYYY-MM-DD format</li>
+                            <li class="mb-2"><strong>listing_date</strong> - YYYY-MM-DD format (optional)</li>
+                            <li class="mb-2"><strong>status</strong> - upcoming, ongoing, listed</li>
+                            <li class="mb-2"><strong>ipo_price</strong> - IPO price (optional)</li>
+                            <li class="mb-2"><strong>listing_price</strong> - Listing price (optional)</li>
+                            <li class="mb-2"><strong>current_market_price</strong> - Current market price (optional)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-check-circle text-success me-2"></i>Validation Rules
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-check text-success me-1"></i>Company names are unique</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-1"></i>Dates are in valid format</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-1"></i>Issue type is valid</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-1"></i>Status is valid</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-1"></i>Price fields are numeric (if provided)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function previewFile() {
+    const fileInput = document.getElementById('csvFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Please select a CSV file first.');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csv = e.target.result;
+        const lines = csv.split('\n');
+        const headers = lines[0].split(',');
+        
+        let previewHtml = '';
+        for (let i = 1; i < Math.min(6, lines.length); i++) {
+            if (lines[i].trim()) {
+                const values = lines[i].split(',');
+                previewHtml += '<tr>';
+                previewHtml += '<td>' + (values[0] || '') + '</td>';
+                previewHtml += '<td>' + (values[1] || '') + '</td>';
+                previewHtml += '<td>' + (values[3] || '') + '</td>';
+                previewHtml += '<td><span class="badge bg-' + getStatusColor(values[7]) + '">' + (values[7] || '') + '</span></td>';
+                previewHtml += '<td>' + (values[4] || '') + '</td>';
+                previewHtml += '</tr>';
+            }
+        }
+        
+        document.getElementById('previewTableBody').innerHTML = previewHtml;
+        document.getElementById('previewSection').style.display = 'block';
+    };
+    reader.readAsText(file);
+}
+
+function getStatusColor(status) {
+    switch(status?.toLowerCase()) {
+        case 'upcoming': return 'primary';
+        case 'ongoing': return 'warning';
+        case 'listed': return 'success';
+        default: return 'secondary';
+    }
+}
+
+// Form submission with loading state
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const btn = document.getElementById('importBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importing...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %} 

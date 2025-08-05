@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Export Data - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Export Data</h1>
+                <p class="mb-0">Export IPO data in various formats with filtering options</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:admin_dashboard' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-download text-info me-2"></i>
+                            Export IPO Data
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="GET" action="{% url 'ipo_app:export_csv' %}" id="exportForm">
+                            <!-- Filter Options -->
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Status Filter</label>
+                                    <select name="status" class="form-select">
+                                        <option value="">All Statuses</option>
+                                        <option value="upcoming" {% if request.GET.status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                                        <option value="ongoing" {% if request.GET.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                                        <option value="listed" {% if request.GET.status == 'listed' %}selected{% endif %}>Listed</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Date From</label>
+                                    <input type="date" name="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Date To</label>
+                                    <input type="date" name="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                                </div>
+                            </div>
+                            
+                            <!-- Export Options -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Export Format</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="format" id="csv" value="csv" checked>
+                                        <label class="form-check-label" for="csv">
+                                            <i class="fas fa-file-csv text-success me-2"></i>CSV Format
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="format" id="excel" value="excel" disabled>
+                                        <label class="form-check-label text-muted" for="excel">
+                                            <i class="fas fa-file-excel text-success me-2"></i>Excel Format (Coming Soon)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Data Range</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="range" id="all" value="all" checked>
+                                        <label class="form-check-label" for="all">All IPOs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="range" id="filtered" value="filtered">
+                                        <label class="form-check-label" for="filtered">Filtered Results</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview Section -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">Data Preview</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Company</th>
+                                                <th>Status</th>
+                                                <th>Issue Size</th>
+                                                <th>Open Date</th>
+                                                <th>Applications</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="previewTable">
+                                            <!-- Preview data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <small class="text-muted">Showing first 5 records. Full export will include all matching records.</small>
+                            </div>
+                            
+                            <!-- Export Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-info btn-lg">
+                                    <i class="fas fa-download me-2"></i>
+                                    Export Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Export Statistics -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-bar text-primary me-2"></i>
+                            Export Statistics
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <h4 class="text-primary mb-1" id="totalCount">{{ total_count }}</h4>
+                                <small class="text-muted">Total IPOs</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h4 class="text-success mb-1" id="filteredCount">{{ filtered_count }}</h4>
+                                <small class="text-muted">Filtered Results</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <strong>Export Includes:</strong>
+                            <ul class="list-unstyled mt-2">
+                                <li><i class="fas fa-check text-success me-2"></i>Company details</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Financial data</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Performance metrics</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Application counts</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Timestamps</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Export Options -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-bolt text-warning me-2"></i>
+                            Quick Export
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'ipo_app:export_csv' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-download me-2"></i>All IPOs
+                            </a>
+                            <a href="{% url 'ipo_app:export_csv' %}?status=upcoming" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-calendar-plus me-2"></i>Upcoming IPOs
+                            </a>
+                            <a href="{% url 'ipo_app:export_csv' %}?status=ongoing" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-clock me-2"></i>Ongoing IPOs
+                            </a>
+                            <a href="{% url 'ipo_app:export_csv' %}?status=listed" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-check-circle me-2"></i>Listed IPOs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update preview when filters change
+    const filterInputs = document.querySelectorAll('select[name="status"], input[name="date_from"], input[name="date_to"]');
+    filterInputs.forEach(input => {
+        input.addEventListener('change', updatePreview);
+    });
+    
+    function updatePreview() {
+        const form = document.getElementById('exportForm');
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+        
+        // Update filtered count
+        fetch(`/api/ipos/?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('filteredCount').textContent = data.count || 0;
+                
+                // Update preview table
+                const previewTable = document.getElementById('previewTable');
+                previewTable.innerHTML = '';
+                
+                data.results.slice(0, 5).forEach(ipo => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${ipo.company_name}</td>
+                        <td><span class="badge bg-${ipo.status === 'upcoming' ? 'primary' : ipo.status === 'ongoing' ? 'warning' : 'success'}">${ipo.status}</span></td>
+                        <td>₹${ipo.issue_size} Cr</td>
+                        <td>${ipo.open_date ? new Date(ipo.open_date).toLocaleDateString() : '-'}</td>
+                        <td>${ipo.total_applications || 0}</td>
+                    `;
+                    previewTable.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error updating preview:', error);
+            });
+    }
+    
+    // Initial preview load
+    updatePreview();
+});
+</script>
+{% endblock %} 

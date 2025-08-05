@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse IPOs - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Discover Investment Opportunities
+                </h1>
+                <p class="lead mb-4">
+                    Track upcoming IPOs, monitor ongoing issues, and analyze listed companies. 
+                    Your comprehensive platform for IPO information and investment decisions.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#ipo-grid" class="btn btn-light btn-lg">
+                        <i class="fas fa-chart-line me-2"></i>Browse IPOs
+                    </a>
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <a href="{% url 'ipo_app:admin_dashboard' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{% url 'ipo_app:user_dashboard' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-user me-2"></i>My Dashboard
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'ipo_app:login' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <div class="bg-white bg-opacity-10 rounded-4 p-4">
+                        <i class="fas fa-chart-line text-white" style="font-size: 4rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-primary mx-auto mb-3">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary">{{ total_upcoming|default:0 }}</h3>
+                    <p class="text-muted mb-0">Upcoming IPOs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-warning mx-auto mb-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="fw-bold text-warning">{{ total_ongoing|default:0 }}</h3>
+                    <p class="text-muted mb-0">Ongoing IPOs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-success mx-auto mb-3">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="fw-bold text-success">{{ total_listed|default:0 }}</h3>
+                    <p class="text-muted mb-0">Listed IPOs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-primary mx-auto mb-3">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary">{{ total_all|default:0 }}</h3>
+                    <p class="text-muted mb-0">Total IPOs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filters Section -->
+<section class="py-4" id="ipo-grid">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Search Bar -->
+                <div class="search-container mb-4">
+                    <div class="position-relative">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search IPOs by company name..." onkeyup="performSearch()">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <!-- Status Filter Buttons -->
+                <div class="d-flex gap-2 mb-4">
+                    <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-outline-primary {% if not request.GET.status %}active{% endif %}">
+                        <i class="fas fa-list me-2"></i>All
+                    </a>
+                    <a href="{% url 'ipo_app:ipo_list' %}?status=upcoming" class="btn btn-outline-primary {% if request.GET.status == 'upcoming' %}active{% endif %}">
+                        <i class="fas fa-calendar-plus me-2"></i>Upcoming
+                    </a>
+                    <a href="{% url 'ipo_app:ipo_list' %}?status=ongoing" class="btn btn-outline-warning {% if request.GET.status == 'ongoing' %}active{% endif %}">
+                        <i class="fas fa-clock me-2"></i>Ongoing
+                    </a>
+                    <a href="{% url 'ipo_app:ipo_list' %}?status=listed" class="btn btn-outline-success {% if request.GET.status == 'listed' %}active{% endif %}">
+                        <i class="fas fa-check-circle me-2"></i>Listed
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- IPO Grid Section -->
+<section class="py-4">
+    <div class="container">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if ipos %}
+            <div class="grid-container">
+                {% for ipo in ipos %}
+                    <div class="card ipo-card h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title fw-bold mb-2">{{ ipo.company_name }}</h5>
+                                    <span class="badge {% if ipo.status == 'upcoming' %}bg-primary{% elif ipo.status == 'ongoing' %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ ipo.get_status_display }}
+                                    </span>
+                                </div>
+                                {% if ipo.logo %}
+                                    <img src="{{ ipo.logo.url }}" alt="{{ ipo.company_name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-building text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-tag text-primary me-2"></i>
+                                        <small class="text-muted">{{ ipo.issue_type }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-rupee-sign text-success me-2"></i>
+                                        <small class="text-muted">{{ ipo.price_band }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-chart-line text-info me-2"></i>
+                                        <small class="text-muted">{{ ipo.issue_size }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-calendar text-warning me-2"></i>
+                                        <small class="text-muted">{{ ipo.open_date|date:"M d, Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if ipo.status == 'listed' and ipo.listing_gain %}
+                                <div class="alert alert-info py-2 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="fw-bold">Listing Gain</small>
+                                        <span class="badge {% if ipo.listing_gain > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ ipo.listing_gain }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'ipo_app:ipo_detail' ipo.pk %}" class="btn btn-primary btn-sm flex-fill">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a>
+                                {% if user.is_authenticated %}
+                                    <button class="btn btn-outline-primary btn-sm" onclick="trackIPO({{ ipo.pk }})" title="Track IPO">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav aria-label="IPO pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="text-muted mb-3">No IPOs Found</h4>
+                <p class="text-muted mb-4">
+                    {% if request.GET.search %}
+                        No IPOs match your search criteria. Try adjusting your search terms.
+                    {% elif request.GET.status %}
+                        No IPOs found for the selected status. Try browsing all IPOs.
+                    {% else %}
+                        No IPOs are currently available. Check back later for new opportunities.
+                    {% endif %}
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-primary">
+                        <i class="fas fa-list me-2"></i>View All IPOs
+                    </a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'ipo_app:bulk_import' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-upload me-2"></i>Import IPOs
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Track IPO functionality
+    function trackIPO(ipoId) {
+        // Create a form and submit it instead of using fetch
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/track-ipo/${ipoId}/`;
+        
+        // Add CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        form.appendChild(csrfToken);
+        
+        // Submit the form
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // Enhanced search functionality
+    function performSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const searchTerm = searchInput.value.toLowerCase();
+        const ipoCards = document.querySelectorAll('.ipo-card');
+        
+        ipoCards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.3s ease-in';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Add CSRF token to all AJAX requests
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            const token = document.createElement('input');
+            token.type = 'hidden';
+            token.name = 'csrfmiddlewaretoken';
+            token.value = '{{ csrf_token }}';
+            document.body.appendChild(token);
+        }
+    });
+
+    // Notification function
+    function showNotification(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            <i class="fas fa-info-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Insert at the top of the container
+        const container = document.querySelector('.container');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+</script>
+{% endblock %} 

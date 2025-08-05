@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Performance - {{ ipo.company_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Track Performance</h1>
+                <p class="mb-0">{{ ipo.company_name }} - Performance Analysis</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:ipo_detail' ipo.pk %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to IPO
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <!-- IPO Overview -->
+        <div class="row mb-5">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Performance Overview
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted">IPO Price</h6>
+                                <h4 class="mb-0">₹{{ ipo.ipo_price|default:"--" }}</h4>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted">Listing Price</h6>
+                                <h4 class="mb-0">₹{{ ipo.listing_price|default:"--" }}</h4>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted">Current Market Price</h6>
+                                <h4 class="mb-0">₹{{ ipo.current_market_price|default:"--" }}</h4>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted">Days Since Listing</h6>
+                                <h4 class="mb-0">{{ days_since_listing|default:"--" }} days</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-percentage me-2"></i>Returns
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if listing_gain %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Listing Gain</h6>
+                            <h4 class="mb-0 {% if listing_gain > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ listing_gain }}%
+                            </h4>
+                        </div>
+                        {% endif %}
+                        {% if current_return %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Current Return</h6>
+                            <h4 class="mb-0 {% if current_return > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ current_return }}%
+                            </h4>
+                        </div>
+                        {% endif %}
+                        {% if total_return %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Total Return (IPO to Current)</h6>
+                            <h4 class="mb-0 {% if total_return > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ total_return|floatformat:2 }}%
+                            </h4>
+                        </div>
+                        {% endif %}
+                        {% if price_change %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Price Change (Listing to Current)</h6>
+                            <h4 class="mb-0 {% if price_change > 0 %}text-success{% else %}text-danger{% endif %}">
+                                ₹{{ price_change|floatformat:2 }}
+                            </h4>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-area me-2"></i>Price Performance Chart
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="performanceChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calculator me-2"></i>Performance Metrics
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Issue Size</h6>
+                                <p class="mb-0">{{ ipo.issue_size }}</p>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Issue Type</h6>
+                                <p class="mb-0">{{ ipo.issue_type }}</p>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Listing Date</h6>
+                                <p class="mb-0">{{ ipo.listing_date|date:"M d, Y"|default:"--" }}</p>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Price Band</h6>
+                                <p class="mb-0">{{ ipo.price_band }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Analysis
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if listing_gain and listing_gain > 0 %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-arrow-up me-2"></i>
+                                <strong>Positive Listing Gain:</strong> The stock gained {{ listing_gain }}% on listing day.
+                            </div>
+                        {% elif listing_gain and listing_gain < 0 %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-arrow-down me-2"></i>
+                                <strong>Negative Listing Gain:</strong> The stock fell {{ abs_listing_gain }}% on listing day.
+                            </div>
+                        {% endif %}
+                        
+                        {% if current_return and current_return > 0 %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-chart-line me-2"></i>
+                                <strong>Positive Current Return:</strong> The stock is up {{ current_return }}% from listing price.
+                            </div>
+                        {% elif current_return and current_return < 0 %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-chart-line me-2"></i>
+                                <strong>Negative Current Return:</strong> The stock is down {{ abs_current_return }}% from listing price.
+                            </div>
+                        {% endif %}
+                        
+                        {% if not listing_gain and not current_return %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Limited Data:</strong> Performance data is not available for this IPO.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    // Sample data - in real app, this would come from API
+    const ipoPrice = {{ ipo.ipo_price|default:0 }};
+    const listingPrice = {{ ipo.listing_price|default:0 }};
+    const currentPrice = {{ ipo.current_market_price|default:0 }};
+    
+    const labels = ['IPO Price', 'Listing Price', 'Current Price'];
+    const data = [ipoPrice, listingPrice, currentPrice];
+    const colors = ['#007bff', '#28a745', '#ffc107'];
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Price (₹)',
+                data: data,
+                backgroundColor: colors,
+                borderColor: colors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Application Status - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Update Application Status</h1>
+                <p class="mb-0">Review and update application for {{ application.ipo.company_name }}</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:manage_applications' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Applications
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>Application Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">User Information</h6>
+                                <p class="mb-1"><strong>Username:</strong> {{ application.user.username }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ application.user.email }}</p>
+                                <p class="mb-0"><strong>Applied:</strong> {{ application.application_date|date:"M d, Y H:i" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">IPO Information</h6>
+                                <p class="mb-1"><strong>Company:</strong> {{ application.ipo.company_name }}</p>
+                                <p class="mb-1"><strong>Issue Type:</strong> {{ application.ipo.issue_type }}</p>
+                                <p class="mb-0"><strong>Quantity:</strong> {{ application.quantity_applied }} shares</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted">Current Status</h6>
+                            <span class="badge bg-{% if application.status == 'applied' %}warning{% elif application.status == 'approved' %}success{% elif application.status == 'rejected' %}danger{% elif application.status == 'allotted' %}success{% elif application.status == 'not_allotted' %}secondary{% else %}secondary{% endif %} fs-6">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                        
+                        {% if application.remarks %}
+                        <div class="mb-4">
+                            <h6 class="text-muted">User Remarks</h6>
+                            <p class="mb-0">{{ application.remarks }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Update Status</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="applied" {% if application.status == 'applied' %}selected{% endif %}>Applied</option>
+                                    <option value="under_review" {% if application.status == 'under_review' %}selected{% endif %}>Under Review</option>
+                                    <option value="approved" {% if application.status == 'approved' %}selected{% endif %}>Approved</option>
+                                    <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                    <option value="allotted" {% if application.status == 'allotted' %}selected{% endif %}>Allotted</option>
+                                    <option value="not_allotted" {% if application.status == 'not_allotted' %}selected{% endif %}>Not Allotted</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Admin Remarks (Optional)</label>
+                                <textarea name="admin_remarks" class="form-control" rows="3" placeholder="Add remarks for the user...">{{ application.remarks }}</textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'ipo_app:manage_applications' %}" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

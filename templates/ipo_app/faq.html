@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Frequently Asked Questions</h1>
+                <p class="mb-0">Find answers to common questions about our platform</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:home' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <!-- General Questions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                What is Bluestock Fintech?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Bluestock Fintech is a comprehensive IPO tracking and investment platform that helps individual investors track, analyze, and apply for Initial Public Offerings (IPOs) in India. We provide real-time updates, performance tracking, and application management tools.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                How do I create an account?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can create an account by clicking the "Sign Up" button on our homepage. You'll need to provide your email address, create a password, and verify your email. Once verified, you can start tracking IPOs and using all our features.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- IPO Tracking -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                How do I track an IPO?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                To track an IPO, simply visit the IPO details page and click the "Track IPO" button. You'll receive notifications about important updates, dates, and performance metrics for that specific IPO.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                What information do you provide for each IPO?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                For each IPO, we provide comprehensive information including company details, issue size, price band, important dates, financial metrics, risk factors, and post-listing performance data. We also offer expert analysis and recommendations.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applications -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading5">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                                Can I apply for IPOs through your platform?
+                            </button>
+                        </h2>
+                        <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! You can apply for IPOs directly through our platform. We provide a streamlined application process that helps you submit your application with all necessary details. You can track your application status and manage multiple applications from your dashboard.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading6">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6">
+                                What documents do I need to apply for an IPO?
+                            </button>
+                        </h2>
+                        <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You'll need your PAN card, Aadhaar card, bank account details, and Demat account information. For some IPOs, you might also need additional documents like income proof or investment experience certificates.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading7">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7">
+                                How do notifications work?
+                            </button>
+                        </h2>
+                        <div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We send notifications for important IPO events like opening dates, closing dates, allotment results, and listing dates. You can customize your notification preferences in your account settings. Notifications are sent via email and in-app alerts.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Tracking -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading8">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8">
+                                How do I track IPO performance?
+                            </button>
+                        </h2>
+                        <div id="collapse8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can track IPO performance through our "Track Performance" feature. This shows you post-listing price movements, returns, volume analysis, and comparison with market indices. You can also set up alerts for specific price levels.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading9">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse9">
+                                Is my data secure?
+                            </button>
+                        </h2>
+                        <div id="collapse9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, we take data security very seriously. We use industry-standard encryption, secure servers, and follow strict privacy policies. Your personal and financial information is protected and never shared with third parties without your consent.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading10">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse10">
+                                What if I forget my password?
+                            </button>
+                        </h2>
+                        <div id="collapse10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can reset your password by clicking the "Forgot Password" link on the login page. We'll send a password reset link to your registered email address. Make sure to use a strong password and keep it secure.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading11">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse11">
+                                How can I get customer support?
+                            </button>
+                        </h2>
+                        <div id="collapse11" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can reach our customer support team through multiple channels: email at support@bluestockfintech.com, phone at +91 98765 43210, or through our contact form. We typically respond within 24 hours.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading12">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse12">
+                                Is the platform free to use?
+                            </button>
+                        </h2>
+                        <div id="collapse12" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Basic IPO tracking and information is free for all users. We offer premium features like advanced analytics, priority notifications, and expert recommendations for a subscription fee. Check our pricing page for detailed information.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <p class="text-muted">Still have questions?</p>
+                    <a href="{% url 'ipo_app:contact_us' %}" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

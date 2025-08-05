@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Analytics Dashboard</h1>
+                <p class="mb-0">Comprehensive IPO statistics, trends, and performance metrics</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:admin_dashboard' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Metrics Cards -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-chart-line text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 class="text-primary mb-1">{{ total_ipos }}</h4>
+                        <p class="text-muted mb-0">Total IPOs</p>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up me-1"></i>{{ growth_rate|default:"0" }}% this month
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-rupee-sign text-success" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 class="text-success mb-1">₹{{ total_issue_size|floatformat:0|default:"0" }} Cr</h4>
+                        <p class="text-muted mb-0">Total Issue Size</p>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up me-1"></i>{{ avg_issue_size|floatformat:0|default:"0" }} Cr avg
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-users text-warning" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 class="text-warning mb-1">{{ total_applications }}</h4>
+                        <p class="text-muted mb-0">Total Applications</p>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up me-1"></i>{{ avg_applications_per_ipo|floatformat:1|default:"0" }} per IPO
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-percentage text-info" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 class="text-info mb-1">{{ avg_gain_loss|floatformat:1|default:"0" }}%</h4>
+                        <p class="text-muted mb-0">Avg Gain/Loss</p>
+                        <small class="{% if avg_gain_loss > 0 %}text-success{% else %}text-danger{% endif %}">
+                            <i class="fas fa-{% if avg_gain_loss > 0 %}arrow-up{% else %}arrow-down{% endif %} me-1"></i>
+                            {{ listed_count }} listed IPOs
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Breakdown -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Upcoming IPOs</h6>
+                        <h3 class="text-primary">{{ upcoming_count }}</h3>
+                        <small class="text-muted">{{ upcoming_percentage|floatformat:1 }}% of total</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Ongoing IPOs</h6>
+                        <h3 class="text-warning">{{ ongoing_count }}</h3>
+                        <small class="text-muted">{{ ongoing_percentage|floatformat:1 }}% of total</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Listed IPOs</h6>
+                        <h3 class="text-success">{{ listed_count }}</h3>
+                        <small class="text-muted">{{ listed_percentage|floatformat:1 }}% of total</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Active Users</h6>
+                        <h3 class="text-info">{{ active_users }}</h3>
+                        <small class="text-muted">{{ user_growth|default:"0" }}% growth</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <!-- IPO Status Chart -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-pie text-primary me-2"></i>
+                            IPO Status Distribution
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="ipoStatusChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Trend Chart -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-line text-success me-2"></i>
+                            Monthly IPO Trends
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyTrendChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="row">
+            <!-- Issue Size Distribution -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-bar text-warning me-2"></i>
+                            Issue Size Distribution
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="issueSizeChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance vs Issue Size -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-scatter text-info me-2"></i>
+                            Performance vs Issue Size
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="performanceChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Statistics -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-table text-secondary me-2"></i>
+                            Top Performing IPOs
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Issue Size</th>
+                                        <th>IPO Price</th>
+                                        <th>Current Price</th>
+                                        <th>Gain/Loss</th>
+                                        <th>Applications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ipo in top_performers %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'ipo_app:ipo_detail' ipo.id %}" class="text-decoration-none">
+                                                {{ ipo.company_name }}
+                                            </a>
+                                        </td>
+                                        <td>₹{{ ipo.issue_size }} Cr</td>
+                                        <td>₹{{ ipo.ipo_price|default:"--" }}</td>
+                                        <td>₹{{ ipo.current_market_price|default:"--" }}</td>
+                                        <td>
+                                            <span class="badge {% if ipo.gain_loss > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ ipo.gain_loss|floatformat:1 }}%
+                                            </span>
+                                        </td>
+                                        <td>{{ ipo.application_count }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No data available</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-list text-secondary me-2"></i>
+                            Quick Stats
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted">Average Issue Size</small>
+                            <h6 class="mb-0">₹{{ avg_issue_size|floatformat:0|default:"0" }} Cr</h6>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Average IPO Price</small>
+                            <h6 class="mb-0">₹{{ avg_ipo_price|floatformat:2|default:"0" }}</h6>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Average Listing Price</small>
+                            <h6 class="mb-0">₹{{ avg_listing_price|floatformat:2|default:"0" }}</h6>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Average Applications per IPO</small>
+                            <h6 class="mb-0">{{ avg_applications_per_ipo|floatformat:1|default:"0" }}</h6>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Most Popular IPO</small>
+                            <h6 class="mb-0">{{ most_popular_ipo|default:"--" }}</h6>
+                        </div>
+                        <div>
+                            <small class="text-muted">Total Applications</small>
+                            <h6 class="mb-0">{{ total_applications }}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // IPO Status Chart
+    const statusCtx = document.getElementById('ipoStatusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Upcoming', 'Ongoing', 'Listed'],
+            datasets: [{
+                data: [{{ upcoming_count }}, {{ ongoing_count }}, {{ listed_count }}],
+                backgroundColor: [
+                    'rgba(13, 110, 253, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(25, 135, 84, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(13, 110, 253, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(25, 135, 84, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Monthly Trend Chart
+    const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [{
+                label: 'IPOs Launched',
+                data: {{ monthly_data|safe }},
+                borderColor: 'rgba(13, 110, 253, 1)',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    precision: 0
+                }
+            }
+        }
+    });
+
+    // Issue Size Chart
+    const sizeCtx = document.getElementById('issueSizeChart').getContext('2d');
+    new Chart(sizeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['< 100 Cr', '100-500 Cr', '500-1000 Cr', '> 1000 Cr'],
+            datasets: [{
+                label: 'Number of IPOs',
+                data: {{ issue_size_data|safe }},
+                backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    precision: 0
+                }
+            }
+        }
+    });
+
+    // Performance Chart
+    const perfCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(perfCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'IPO Performance',
+                data: {{ performance_data|safe }},
+                backgroundColor: 'rgba(13, 110, 253, 0.6)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Issue Size (Cr)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Gain/Loss (%)'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

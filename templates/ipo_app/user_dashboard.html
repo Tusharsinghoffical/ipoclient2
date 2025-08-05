@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    Welcome Back, {{ user.username }}!
+                </h1>
+                <p class="lead mb-4">
+                    Track your favorite IPOs, manage applications, set reminders, and stay updated with the latest investment opportunities.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Browse IPOs
+                    </a>
+                    <a href="{% url 'ipo_app:my_applications' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-file-alt me-2"></i>My Applications
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="position-relative">
+                    <div class="bg-white bg-opacity-10 rounded-4 p-4">
+                        <i class="fas fa-user text-white" style="font-size: 4rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Overview -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-primary mx-auto mb-3">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary">{{ tracked_ipos_count }}</h3>
+                    <p class="text-muted mb-0">Tracked IPOs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-success mx-auto mb-3">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="fw-bold text-success">{{ applications_count }}</h3>
+                    <p class="text-muted mb-0">Applications</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-warning mx-auto mb-3">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="fw-bold text-warning">{{ reminders_count }}</h3>
+                    <p class="text-muted mb-0">Active Reminders</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card text-center">
+                    <div class="icon bg-gradient-info mx-auto mb-3">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="fw-bold text-info">{{ notifications_count }}</h3>
+                    <p class="text-muted mb-0">Notifications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Dashboard Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Tracked IPOs -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-star text-warning me-2"></i>My Tracked IPOs
+                        </h5>
+                        <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus me-2"></i>Track More
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if tracked_ipos %}
+                            <div class="row g-3">
+                                {% for tracking in tracked_ipos %}
+                                    <div class="col-md-6">
+                                        <div class="card border h-100">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="fw-bold mb-1">{{ tracking.ipo.company_name }}</h6>
+                                                        <span class="badge {% if tracking.ipo.status == 'upcoming' %}bg-primary{% elif tracking.ipo.status == 'ongoing' %}bg-warning{% else %}bg-success{% endif %}">
+                                                            {{ tracking.ipo.get_status_display }}
+                                                        </span>
+                                                    </div>
+                                                    <small class="text-muted">{{ tracking.tracked_at|date:"M d" }}</small>
+                                                </div>
+                                                <div class="row g-2 mb-3">
+                                                    <div class="col-6">
+                                                        <small class="text-muted d-block">Price Band</small>
+                                                        <strong>{{ tracking.ipo.price_band }}</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted d-block">Issue Size</small>
+                                                        <strong>{{ tracking.ipo.issue_size }}</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <a href="{% url 'ipo_app:ipo_detail' tracking.ipo.pk %}" class="btn btn-primary btn-sm flex-fill">
+                                                        <i class="fas fa-eye me-1"></i>View
+                                                    </a>
+                                                    {% if tracking.ipo.status == 'upcoming' %}
+                                                        <a href="{% url 'ipo_app:set_reminder' tracking.ipo.pk %}" class="btn btn-outline-warning btn-sm">
+                                                            <i class="fas fa-bell"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-star text-muted" style="font-size: 3rem;"></i>
+                                <h6 class="text-muted mt-3">No Tracked IPOs</h6>
+                                <p class="text-muted">Start tracking IPOs to see them here</p>
+                                <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Browse IPOs
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Applications -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-alt text-success me-2"></i>Recent Applications
+                        </h5>
+                        <a href="{% url 'ipo_app:my_applications' %}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-eye me-2"></i>View All
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_applications %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>IPO</th>
+                                            <th>Status</th>
+                                            <th>Applied Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for application in recent_applications %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        {% if application.ipo.logo %}
+                                                            <img src="{{ application.ipo.logo.url }}" alt="{{ application.ipo.company_name }}" class="rounded me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                                        {% else %}
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                                                <i class="fas fa-building text-muted"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div>
+                                                            <div class="fw-bold">{{ application.ipo.company_name }}</div>
+                                                            <small class="text-muted">{{ application.ipo.issue_type }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge {% if application.status == 'approved' %}bg-success{% elif application.status == 'rejected' %}bg-danger{% elif application.status == 'allotted' %}bg-primary{% else %}bg-warning{% endif %}">
+                                                        {{ application.get_status_display }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ application.application_date|date:"M d, Y" }}</td>
+                                                <td>
+                                                    <a href="{% url 'ipo_app:ipo_detail' application.ipo.pk %}" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-file-alt text-muted" style="font-size: 3rem;"></i>
+                                <h6 class="text-muted mt-3">No Applications</h6>
+                                <p class="text-muted">Apply for IPOs to see your applications here</p>
+                                <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-success">
+                                    <i class="fas fa-plus me-2"></i>Apply for IPOs
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Quick Actions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Browse IPOs
+                            </a>
+                            <a href="{% url 'ipo_app:my_applications' %}" class="btn btn-success">
+                                <i class="fas fa-file-alt me-2"></i>My Applications
+                            </a>
+                            <a href="{% url 'ipo_app:my_reminders' %}" class="btn btn-warning">
+                                <i class="fas fa-bell me-2"></i>My Reminders
+                            </a>
+                            <a href="{% url 'ipo_app:track_performance' 1 %}" class="btn btn-info">
+                                <i class="fas fa-chart-line me-2"></i>Track Performance
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-envelope text-info me-2"></i>Recent Notifications
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if notifications %}
+                            <div class="notification-list">
+                                {% for notification in notifications %}
+                                    <div class="d-flex mb-3 {% if not notification.is_read %}border-start border-primary border-3 ps-3{% endif %}">
+                                        <div class="flex-shrink-0">
+                                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-info text-white" style="font-size: 0.8rem;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="fw-bold">{{ notification.message }}</div>
+                                            <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                                            {% if not notification.is_read %}
+                                                <a href="{% url 'ipo_app:mark_notification_read' notification.pk %}" class="btn btn-sm btn-outline-primary ms-2">
+                                                    Mark Read
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'ipo_app:all_notifications' %}" class="btn btn-outline-info btn-sm">View All Notifications</a>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-envelope text-muted" style="font-size: 2rem;"></i>
+                                <p class="text-muted mt-2 mb-0">No notifications</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Active Reminders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bell text-warning me-2"></i>Active Reminders
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if active_reminders %}
+                            <div class="reminder-list">
+                                {% for reminder in active_reminders %}
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-bell text-white" style="font-size: 0.8rem;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="fw-bold">{{ reminder.ipo.company_name }}</div>
+                                            <small class="text-muted">{{ reminder.reminder_date|date:"M d, Y" }} at {{ reminder.reminder_time }}</small>
+                                            {% if reminder.message %}
+                                                <div class="mt-1">
+                                                    <small class="text-muted">{{ reminder.message }}</small>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'ipo_app:my_reminders' %}" class="btn btn-outline-warning btn-sm">Manage Reminders</a>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-bell text-muted" style="font-size: 2rem;"></i>
+                                <p class="text-muted mt-2 mb-0">No active reminders</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Messages -->
+{% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add CSRF token to all AJAX requests
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            const token = document.createElement('input');
+            token.type = 'hidden';
+            token.name = 'csrfmiddlewaretoken';
+            token.value = '{{ csrf_token }}';
+            document.body.appendChild(token);
+        }
+    });
+</script>
+{% endblock %} 

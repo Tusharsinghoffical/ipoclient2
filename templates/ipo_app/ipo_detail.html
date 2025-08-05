@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ipo.company_name }} - IPO Details{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="py-3 bg-white">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ipo_app:ipo_list' %}">IPOs</a></li>
+            <li class="breadcrumb-item active">{{ ipo.company_name }}</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- IPO Header -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-3">
+                    {% if ipo.logo %}
+                        <img src="{{ ipo.logo.url }}" alt="{{ ipo.company_name }}" class="rounded me-4" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-building" style="font-size: 2rem; color: #ccc;"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h1 class="h2 mb-2">{{ ipo.company_name }}</h1>
+                        <span class="status-badge status-{{ ipo.status }} fs-6">{{ ipo.get_status_display }}</span>
+                    </div>
+                </div>
+                <p class="lead text-muted mb-0">{{ ipo.issue_type }} • {{ ipo.issue_size }}</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex gap-2 justify-content-lg-end">
+                    {% if ipo.rhp_pdf %}
+                        <a href="{{ ipo.rhp_pdf.url }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-file-pdf me-2"></i>RHP
+                        </a>
+                    {% endif %}
+                    {% if ipo.drhp_pdf %}
+                        <a href="{{ ipo.drhp_pdf.url }}" class="btn btn-outline-secondary" target="_blank">
+                            <i class="fas fa-file-pdf me-2"></i>DRHP
+                        </a>
+                    {% endif %}
+                    {% if is_admin %}
+                        <a href="{% url 'ipo_app:ipo_update' ipo.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit me-2"></i>Edit
+                        </a>
+                        <a href="{% url 'ipo_app:ipo_delete' ipo.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Delete
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- IPO Details -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Information -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>IPO Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Price Band</label>
+                                <h6 class="mb-0">{{ ipo.price_band }}</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Issue Size</label>
+                                <h6 class="mb-0">{{ ipo.issue_size }}</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Issue Type</label>
+                                <h6 class="mb-0">{{ ipo.issue_type }}</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Status</label>
+                                <h6 class="mb-0">
+                                    <span class="status-badge status-{{ ipo.status }}">{{ ipo.get_status_display }}</span>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Dates -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar me-2"></i>Important Dates
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Open Date</label>
+                                <h6 class="mb-0">{{ ipo.open_date|date:"F d, Y" }}</h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Close Date</label>
+                                <h6 class="mb-0">{{ ipo.close_date|date:"F d, Y" }}</h6>
+                            </div>
+                            {% if ipo.listing_date %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Listing Date</label>
+                                <h6 class="mb-0">{{ ipo.listing_date|date:"F d, Y" }}</h6>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Information -->
+                {% if ipo.ipo_price or ipo.listing_price or ipo.current_market_price %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Pricing Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% if ipo.ipo_price %}
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">IPO Price</label>
+                                <h6 class="mb-0">₹{{ ipo.ipo_price }}</h6>
+                            </div>
+                            {% endif %}
+                            {% if ipo.listing_price %}
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Listing Price</label>
+                                <h6 class="mb-0">₹{{ ipo.listing_price }}</h6>
+                            </div>
+                            {% endif %}
+                            {% if ipo.current_market_price %}
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Current Market Price</label>
+                                <h6 class="mb-0">₹{{ ipo.current_market_price }}</h6>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Performance Metrics -->
+                        {% if ipo.listing_gain or ipo.current_return %}
+                        <hr>
+                        <div class="row">
+                            {% if ipo.listing_gain %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Listing Gain</label>
+                                <h6 class="mb-0 {% if ipo.listing_gain > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ ipo.listing_gain }}%
+                                </h6>
+                            </div>
+                            {% endif %}
+                            {% if ipo.current_return %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Current Return</label>
+                                <h6 class="mb-0 {% if ipo.current_return > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ ipo.current_return }}%
+                                </h6>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Quick Stats -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Quick Stats
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Days to Open</span>
+                            <span class="fw-bold">
+                                {% if ipo.status == 'upcoming' %}
+                                    {{ ipo.open_date|timesince }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Days to Close</span>
+                            <span class="fw-bold">
+                                {% if ipo.status == 'ongoing' %}
+                                    {{ ipo.close_date|timesince }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if ipo.listing_date %}
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Days Since Listing</span>
+                            <span class="fw-bold">
+                                {% if ipo.status == 'listed' %}
+                                    {{ ipo.listing_date|timesince }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-cog me-2"></i>Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if ipo.status == 'upcoming' %}
+                                <a href="{% url 'ipo_app:set_reminder' ipo.pk %}" class="btn btn-primary">
+                                    <i class="fas fa-bell me-2"></i>Set Reminder
+                                </a>
+                            {% elif ipo.status == 'ongoing' %}
+                                <a href="{% url 'ipo_app:apply_ipo' ipo.pk %}" class="btn btn-warning">
+                                    <i class="fas fa-external-link-alt me-2"></i>Apply Now
+                                </a>
+                            {% elif ipo.status == 'listed' %}
+                                <a href="{% url 'ipo_app:track_performance' ipo.pk %}" class="btn btn-success">
+                                    <i class="fas fa-chart-line me-2"></i>Track Performance
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'ipo_app:ipo_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related IPOs -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="h4 mb-4">
+            <i class="fas fa-th-large me-2"></i>Other IPOs
+        </h3>
+        <div class="row">
+            {% for related_ipo in ipo.get_related_ipos %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if related_ipo.logo %}
+                                <img src="{{ related_ipo.logo.url }}" alt="{{ related_ipo.company_name }}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-building text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="card-title mb-1">{{ related_ipo.company_name }}</h6>
+                                <span class="status-badge status-{{ related_ipo.status }}">{{ related_ipo.get_status_display }}</span>
+                            </div>
+                        </div>
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Price Band</small>
+                                <strong>{{ related_ipo.price_band }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Issue Size</small>
+                                <strong>{{ related_ipo.issue_size }}</strong>
+                            </div>
+                        </div>
+                        <a href="{% url 'ipo_app:ipo_detail' related_ipo.pk %}" class="btn btn-primary btn-sm w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %} 

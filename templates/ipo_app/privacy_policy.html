@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Privacy Policy - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Privacy Policy</h1>
+                <p class="mb-0">How we collect, use, and protect your information</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:home' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="mb-4">Privacy Policy</h3>
+                        <p class="text-muted">Last updated: July 13, 2025</p>
+                        
+                        <h5 class="mt-4 mb-3">1. Information We Collect</h5>
+                        <p>We collect information you provide directly to us, such as when you create an account, apply for IPOs, or contact us for support.</p>
+                        <ul>
+                            <li>Account information (username, email, password)</li>
+                            <li>IPO application details</li>
+                            <li>Communication preferences</li>
+                            <li>Support requests and feedback</li>
+                        </ul>
+                        
+                        <h5 class="mt-4 mb-3">2. How We Use Your Information</h5>
+                        <p>We use the information we collect to:</p>
+                        <ul>
+                            <li>Provide and maintain our services</li>
+                            <li>Process IPO applications</li>
+                            <li>Send notifications and updates</li>
+                            <li>Improve our platform</li>
+                            <li>Provide customer support</li>
+                        </ul>
+                        
+                        <h5 class="mt-4 mb-3">3. Information Sharing</h5>
+                        <p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.</p>
+                        
+                        <h5 class="mt-4 mb-3">4. Data Security</h5>
+                        <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+                        
+                        <h5 class="mt-4 mb-3">5. Your Rights</h5>
+                        <p>You have the right to:</p>
+                        <ul>
+                            <li>Access your personal information</li>
+                            <li>Correct inaccurate information</li>
+                            <li>Request deletion of your data</li>
+                            <li>Opt-out of marketing communications</li>
+                        </ul>
+                        
+                        <h5 class="mt-4 mb-3">6. Contact Us</h5>
+                        <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-1"><strong>Email:</strong> privacy@bluestockfintech.com</p>
+                            <p class="mb-1"><strong>Phone:</strong> +91 98765 43210</p>
+                            <p class="mb-0"><strong>Address:</strong> Mumbai, Maharashtra, India</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

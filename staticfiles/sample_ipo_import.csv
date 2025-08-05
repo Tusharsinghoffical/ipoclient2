@@ -1,0 +1,6 @@
+company_name,issue_type,price_band,issue_size,open_date,close_date,listing_date,status,ipo_price,listing_price,current_market_price
+TechCorp Solutions,Book Built Issue,₹450 - ₹500,1200 Cr,2025-01-15,2025-01-18,2025-01-25,upcoming,,,
+Innovate Pharma,Fixed Price Issue,₹200,800 Cr,2025-01-20,2025-01-22,2025-01-30,upcoming,,,
+Green Energy Ltd,SME IPO,₹150,50 Cr,2025-01-25,2025-01-27,2025-02-05,upcoming,,,
+Digital Payments,Book Built Issue,₹300 - ₹350,1500 Cr,2025-02-01,2025-02-05,2025-02-12,upcoming,,,
+Healthcare Plus,Fixed Price Issue,₹180,600 Cr,2025-02-10,2025-02-12,2025-02-20,upcoming,,, 

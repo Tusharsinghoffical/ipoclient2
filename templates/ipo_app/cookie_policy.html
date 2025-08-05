@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cookie Policy - Bluestock Fintech{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Cookie Policy</h1>
+                <p class="mb-0">How we use cookies and similar technologies</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:home' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="mb-4">Cookie Policy</h3>
+                        <p class="text-muted">Last updated: July 13, 2025</p>
+                        
+                        <h5 class="mt-4 mb-3">What Are Cookies?</h5>
+                        <p>Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience and understand how you use our site.</p>
+                        
+                        <h5 class="mt-4 mb-3">How We Use Cookies</h5>
+                        <p>We use cookies for the following purposes:</p>
+                        <ul>
+                            <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+                            <li><strong>Authentication Cookies:</strong> To keep you logged in during your session</li>
+                            <li><strong>Preference Cookies:</strong> To remember your settings and preferences</li>
+                            <li><strong>Analytics Cookies:</strong> To understand how visitors use our website</li>
+                        </ul>
+                        
+                        <h5 class="mt-4 mb-3">Types of Cookies We Use</h5>
+                        
+                        <h6 class="mt-3 mb-2">1. Session Cookies</h6>
+                        <p>These cookies are temporary and are deleted when you close your browser. They help maintain your session and security.</p>
+                        
+                        <h6 class="mt-3 mb-2">2. Persistent Cookies</h6>
+                        <p>These cookies remain on your device for a set period and help us remember your preferences.</p>
+                        
+                        <h6 class="mt-3 mb-2">3. Third-Party Cookies</h6>
+                        <p>We may use third-party services that place their own cookies on your device for analytics and functionality.</p>
+                        
+                        <h5 class="mt-4 mb-3">Managing Cookies</h5>
+                        <p>You can control and manage cookies in several ways:</p>
+                        <ul>
+                            <li>Browser settings to block or delete cookies</li>
+                            <li>Opt-out of specific cookie types</li>
+                            <li>Clear cookies from your device</li>
+                        </ul>
+                        
+                        <h5 class="mt-4 mb-3">Cookie Consent</h5>
+                        <p>By using our website, you consent to our use of cookies in accordance with this policy. You can withdraw your consent at any time by changing your browser settings.</p>
+                        
+                        <h5 class="mt-4 mb-3">Updates to This Policy</h5>
+                        <p>We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new policy on this page.</p>
+                        
+                        <h5 class="mt-4 mb-3">Contact Us</h5>
+                        <p>If you have any questions about our Cookie Policy, please contact us at:</p>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-1"><strong>Email:</strong> privacy@bluestockfintech.com</p>
+                            <p class="mb-1"><strong>Phone:</strong> +91 98765 43210</p>
+                            <p class="mb-0"><strong>Address:</strong> Mumbai, Maharashtra, India</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

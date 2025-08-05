@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply for IPO - {{ ipo.company_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-2">Apply for IPO</h1>
+                <p class="mb-0">Submit your application for {{ ipo.company_name }}</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'ipo_app:ipo_detail' ipo.pk %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to IPO
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>Apply for {{ ipo.company_name }}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6>IPO Details:</h6>
+                            <p class="mb-1"><strong>Company:</strong> {{ ipo.company_name }}</p>
+                            <p class="mb-1"><strong>Issue Type:</strong> {{ ipo.issue_type }}</p>
+                            <p class="mb-1"><strong>Price Band:</strong> {{ ipo.price_band }}</p>
+                            <p class="mb-1"><strong>Issue Size:</strong> {{ ipo.issue_size }}</p>
+                            <p class="mb-1"><strong>Open Date:</strong> {{ ipo.open_date|date:"M d, Y" }}</p>
+                            <p class="mb-0"><strong>Close Date:</strong> {{ ipo.close_date|date:"M d, Y" }}</p>
+                        </div>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Quantity to Apply *</label>
+                                <input type="number" name="quantity" class="form-control" min="1" required>
+                                <small class="text-muted">Number of shares you want to apply for</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Remarks (Optional)</label>
+                                <textarea name="remarks" class="form-control" rows="3" placeholder="Any additional notes..."></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Application
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 
